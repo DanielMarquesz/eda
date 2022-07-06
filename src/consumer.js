@@ -1,19 +1,19 @@
 const kafka = require('../kafka')
 
-const topic = '0vs5rme2-default'
+const topic = process.env.TOPIC
 
-const consumer = kafka.consumer({ groupId: 'test-group' })
+const consumer = kafka.consumer({ groupId: process.env.GROUP_ID })
 
 const consume = async () => {
   await consumer.connect()
-  await consumer.subscribe({ topic, fromBeginning: true })
-  await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      console.log({
-        value: message.value,
-      })
-    },
-  })
+  await consumer.subscribe({ topics: [topic] })
+	await consumer.run({
+		eachMessage: ({ message }) => {
+			console.log(`received message: ${message.value}`)
+		},
+	})
+
+  // await consumer.disconnect()
 }
 
 consume()
